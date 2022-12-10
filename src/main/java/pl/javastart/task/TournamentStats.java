@@ -17,7 +17,7 @@ public class TournamentStats {
         do {
             System.out.println("Podaj wynik kolejnego gracza (lub STOP)");
             String userInput = scanner.nextLine();
-            if (userInput.toUpperCase().equals("STOP")) {
+            if ("STOP".equalsIgnoreCase(userInput)) {
                 stop = true;
             } else {
                 addParticipantToList(userInput);
@@ -25,7 +25,7 @@ public class TournamentStats {
         } while (!stop);
 
         Comparator<Participant> comparator = getParticipantComparator(scanner);
-        Collections.sort(list, comparator);
+        list.sort(comparator);
         saveStatisticToFile();
     }
 
@@ -39,16 +39,16 @@ public class TournamentStats {
         System.out.print("(" + SORT_ASC + " - rosnąco, ");
         System.out.print("(" + SORT_DESC + " - malejąco)");
         int direction = scanner.nextInt();
-        if (direction == SORT_DESC) {
-            direction = -1;
-        }
 
-        Comparator<Participant> comparator = null;
-        switch (choice) {
-            case SORT_BY_FIRSTNAME -> comparator = new FirstnameComparator(direction);
-            case SORT_BY_LASTNAME -> comparator = new LastnameComparator(direction);
-            case SORT_BY_RESULT -> comparator = new ResultComparator(direction);
-            default -> System.out.println("Brak takiej opcji");
+        Comparator<Participant> comparator = switch (choice) {
+            case SORT_BY_FIRSTNAME -> new FirstnameComparator();
+            case SORT_BY_LASTNAME -> new LastnameComparator();
+            case SORT_BY_RESULT -> new ResultComparator();
+            default -> new FirstnameComparator();
+        };
+
+        if (direction == SORT_DESC) {
+            comparator = comparator.reversed();
         }
         return comparator;
     }
@@ -63,7 +63,7 @@ public class TournamentStats {
                 var writer = new BufferedWriter(new FileWriter("stats.csv"));
                 ) {
             for (Participant participant : list) {
-                writer.write(participant.getFirstname() + " " + participant.getLastname() + ";" + participant.getResult());
+                writer.write(participant.toCsv());
                 writer.newLine();
             }
         } catch (IOException e) {

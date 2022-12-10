@@ -1,5 +1,7 @@
 package pl.javastart.task;
 
+import java.util.prefs.PreferenceChangeListener;
+
 public class Participant {
     private String firstname;
     private String lastname;
@@ -33,5 +35,9 @@ public class Participant {
 
     public void setResult(int result) {
         this.result = result;
+    }
+
+    public String toCsv() {
+        return firstname + " " + lastname + ";" + result;
     }
 }
